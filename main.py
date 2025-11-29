@@ -74,31 +74,84 @@ room.grid_columnconfigure(0, weight=1)
 # --- Centered Frame ---
 frame = tk.Frame(room)
 frame.grid(row=0, column=0)
+
+dummy_focus = tk.Label(room)
+dummy_focus.grid(row=0, column=0)
+dummy_focus.lower()  # Send it to back
+
+def remove_focus(event):
+    widget = event.widget
+    # If clicked widget is not an input widget, move focus to dummy
+    if widget not in (states, alphabet, transitions, initial_state, final_states, input_string):
+        dummy_focus.focus_set()
+
+room.bind("<Button-1>", remove_focus)
+
 for i in range(2):  # two columns: labels + entries
     frame.grid_columnconfigure(i, weight=1)
 
 # --- Helper function ---
-def add_label_widget(row, label_text, widget_class=tk.Entry, **kwargs):
+def add_label_widget(row, label_text, widget_class=tk.Entry, placeholder="", **kwargs):
     label = tk.Label(frame, text=label_text, anchor="e", justify="right")
     label.grid(row=row, column=0, sticky="e", padx=5, pady=5)
+
     widget = widget_class(frame, **kwargs)
     widget.grid(row=row, column=1, sticky="we", padx=5, pady=5)
+
+    # Function to add placeholder behavior
+    def on_focus_in(event):
+        if widget_class == tk.Entry:
+            if widget.get() == placeholder:
+                widget.delete(0, tk.END)
+                widget.config(fg="black")
+        elif widget_class == tk.Text:
+            if widget.get("1.0", tk.END).strip() == placeholder:
+                widget.delete("1.0", tk.END)
+                widget.config(fg="black")
+
+    def on_focus_out(event):
+        if widget_class == tk.Entry:
+            if widget.get() == "":
+                widget.insert(0, placeholder)
+                widget.config(fg="grey")
+        elif widget_class == tk.Text:
+            if widget.get("1.0", tk.END).strip() == "":
+                widget.insert("1.0", placeholder)
+                widget.config(fg="grey")
+
+    widget.bind("<FocusIn>", on_focus_in)
+    widget.bind("<FocusOut>", on_focus_out)
+
+    # Set initial placeholder
+    if widget_class == tk.Entry:
+        widget.insert(0, placeholder)
+        widget.config(fg="grey")
+    elif widget_class == tk.Text:
+        widget.insert("1.0", placeholder)
+        widget.config(fg="grey")
+
     return widget
 
 # --- Create the form ---
-states = add_label_widget(0, "States (comma separated):", width=40)
-alphabet = add_label_widget(1, "Alphabet (comma separated):", width=40)
-transitions = add_label_widget(2, "Transitions (one per line):", widget_class=tk.Text, height=6, width=40)
-initial_state = add_label_widget(3, "Initial State:", width=40)
-final_states = add_label_widget(4, "Final States (comma separated):", width=40)
-input_string = add_label_widget(5, "Input String:", width=40)
+states = add_label_widget(0, "States (comma separated):", width=40,  placeholder="q0, q1, q2, q3, q4")
+alphabet = add_label_widget(1, "Alphabet (comma separated):", width=40, placeholder="0, 1, a, b")
+transitions = add_label_widget(2, "Transitions (one per line):", widget_class=tk.Text, height=6, width=40, placeholder="q0, 0=q1\nq1, 1=q2\nq2, a=q3\nq3, b=q4")
+initial_state = add_label_widget(3, "Initial State:", width=40,  placeholder="q0")
+final_states = add_label_widget(4, "Final States (comma separated):", width=40, placeholder="q4")
+input_string = add_label_widget(5, "Input String:", width=40, placeholder="01ab")
 
 # --- Run button ---
 run_button = tk.Button(frame, text="Run DFA", command=run_dfa_button)
 run_button.grid(row=6, column=0, columnspan=2, pady=10)
 
 # --- Result label ---
-result_label = tk.Label(frame, text="", justify="center")
+result_label = tk.Label(
+    frame,
+    text="",
+    justify="left",
+    wraplength=600,   
+    anchor="w"        
+)
 result_label.grid(row=7, column=0, columnspan=2, pady=10)
 
 room.mainloop()
