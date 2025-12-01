@@ -17,14 +17,12 @@ class DFA ():
         current_state = self.initial_state
         state_steps = [current_state]
         
-        print("aaaaaaaaaaaaaaaaa",current_state)
         for symbol in input_string:
             if symbol not in self.alphabet:
                 return SYMBOL_ERROR, state_steps
             
             
             current_state = self.transitions[current_state][symbol]
-            print("aaaaaaaaaaaaaaaaa",current_state)
             
             if current_state is None:
                 return STATE_ERROR, state_steps

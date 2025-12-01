@@ -50,13 +50,7 @@ def run_dfa_button():
             if stop == True:
                 break
 
-        print("pre")
-        print(transitions_dict)
         fn.concatenating(transitions_dict)
-        print("\npos")
-        print(transitions_dict)
-        print("\nstates:",states_list)
-        print(final_states_list)
         dfa_instance = afd.DFA(states_list, alphabet_list, transitions_dict, initial, final_states_list)
         status, steps = dfa_instance.validate_input(input_str)
         step_text = " → ".join(steps)

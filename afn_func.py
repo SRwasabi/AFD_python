@@ -10,11 +10,9 @@ def concatenating(transitions_dict):
 
 def convert(transitions_dict, final_states_list, states_list):
     stop = True
-    print(transitions_dict)
 
     for state in list(transitions_dict.keys()):
         for symbol in list(transitions_dict[state].keys()):
-            print("atual ->",transitions_dict[state][symbol])
             concatenated_states = transitions_dict[state][symbol]
             concatenated_states.sort()
 
@@ -32,17 +30,10 @@ def convert(transitions_dict, final_states_list, states_list):
                         add_transitions(concatenated, sub_symbols, next_state, transitions_dict)
 
             if any(possible_state in final_states_list for possible_state in concatenated_states) and concatenated not in final_states_list:
-                print("ta no any")
                 final_states_list.append(concatenated)
 
-            else:
-                print("bbbbbb",transitions_dict[state][symbol])
-
-            #print("\n",key)
-            print("concatenando",concatenated)
 
             if concatenated not in states_list:
-                print(concatenated)
                 states_list.append(concatenated)
                 stop = False
 
