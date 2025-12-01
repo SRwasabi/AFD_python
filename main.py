@@ -143,7 +143,7 @@ final_states = add_label_widget(4, "Final States (comma separated):", width=40, 
 input_string = add_label_widget(5, "Input String:", width=40, placeholder="01ab")
 
 # --- Run button ---
-run_button = tk.Button(frame, text="Run DFA", command=run_dfa_button)
+run_button = tk.Button(frame, text="Run DFA / NDFA", command=run_dfa_button)
 run_button.grid(row=6, column=0, columnspan=2, pady=10)
 
 # --- Result label ---
