@@ -61,6 +61,7 @@ def run_dfa_button():
         status, steps = dfa_instance.validate_input(input_str)
         step_text = " → ".join(steps)
         send_status(status, step_text)
+        automat_label.config(text=f"States - {dfa_instance.states}\nAlphabet - {dfa_instance.alphabet}\nInitial State - {dfa_instance.initial_state}\nFinal States - {dfa_instance.final_states}\nTransitions Dictonary - {dfa_instance.transitions}")
 
     #except Exception as e:
      #   messagebox.showerror("Error", str(e))
@@ -152,6 +153,15 @@ run_button = tk.Button(frame, text="Run DFA", command=run_dfa_button)
 run_button.grid(row=6, column=0, columnspan=2, pady=10)
 
 # --- Result label ---
+automat_label = tk.Label(
+    frame,
+    text="",
+    justify="left",
+    wraplength=600,   
+    anchor="w"        
+)
+automat_label.grid(row=7, column=0, columnspan=2, pady=10)
+
 result_label = tk.Label(
     frame,
     text="",
@@ -159,7 +169,9 @@ result_label = tk.Label(
     wraplength=600,   
     anchor="w"        
 )
-result_label.grid(row=7, column=0, columnspan=2, pady=10)
+result_label.grid(row=8, column=0, columnspan=2, pady=10)
+
+
 
 room.mainloop()
 
