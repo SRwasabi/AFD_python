@@ -1,11 +1,13 @@
 import tkinter as tk
 from tkinter import messagebox
+import afn_func as fn
 import afd
 
 ACCEPTED = 0
 SYMBOL_ERROR = 1
 STATE_ERROR = 2
 NOT_FINAL_ERROR = 3
+
 
 def center_window(window, width, height):
     window.update_idletasks() 
@@ -15,37 +17,8 @@ def center_window(window, width, height):
     y = (screen_height // 2) - (height // 2)
     window.geometry(f'{width}x{height}+{x}+{y}')
 
-def run_dfa_button():
-    try:
-        states_list = [state.strip() for state in states.get().split(',')]
-        alphabet_list = [symbol.strip() for symbol in alphabet.get().split(',')]
-        
-        transitions_dict = {}
-        transitions_input = transitions.get("1.0", tk.END).strip().split('\n')
 
-        # (q0, 1) = q1
-        for line in transitions_input:
-            parts = line.split('=')
-            if len(parts) == 2:
-                left, right = parts
-                state_symbol = left.strip().strip().split(',')
-                
-                if len(state_symbol) == 2:
-                    state = state_symbol[0].strip()
-                    symbol = state_symbol[1].strip()
-                    next_state = right.strip()
-                    if (state, symbol) in transitions_dict:
-                        raise Exception(f"Warning: Transition for ({state}, {symbol}) is being overwritten.\n\nThis is not allowed in a DFA.")
-                    transitions_dict[(state, symbol)] = next_state
-
-        initial = initial_state.get().strip()
-        final_states_list = [state.strip() for state in final_states.get().split(',')]
-        input_str = input_string.get().strip()
-
-        dfa_instance = afd.DFA(states_list, alphabet_list, transitions_dict, initial, final_states_list)
-        status, steps = dfa_instance.validate_input(input_str)
-        step_text = " → ".join(steps)
-
+def send_status(status, step_text):
         if status == ACCEPTED:
             result_label.config(text=f"ACCEPTED ✅\n\nPath:\n{step_text}")
         elif status == SYMBOL_ERROR:
@@ -57,9 +30,43 @@ def run_dfa_button():
         else:
             result_label.config(text="An unexpected error occurred.")
 
-    except Exception as e:
-        messagebox.showerror("Error", str(e))
-        return
+
+def run_dfa_button():
+    #try:
+        states_list = [state.strip() for state in states.get().split(',')]
+        alphabet_list = [symbol.strip() for symbol in alphabet.get().split(',')]
+        initial = initial_state.get().strip()
+        final_states_list = [state.strip() for state in final_states.get().split(',')]
+        input_str = input_string.get().strip()
+        
+        transitions_dict = {}
+        transitions_input = transitions.get("1.0", tk.END).strip().split('\n')
+
+        # (q0, 1) = q1
+        fn.get_initial_transitions(transitions_input, transitions_dict)
+
+        while True:
+            stop = fn.convert(transitions_dict, final_states_list, states_list)
+            if stop == True:
+                break
+
+        print("pre")
+        print(transitions_dict)
+        fn.concatenating(transitions_dict)
+        print("\npos")
+        print(transitions_dict)
+        print("\nstates:",states_list)
+        print(final_states_list)
+        dfa_instance = afd.DFA(states_list, alphabet_list, transitions_dict, initial, final_states_list)
+        status, steps = dfa_instance.validate_input(input_str)
+        step_text = " → ".join(steps)
+        send_status(status, step_text)
+
+    #except Exception as e:
+     #   messagebox.showerror("Error", str(e))
+      #  return
+
+
 
 # --- Main Window ---
 room = tk.Tk()
